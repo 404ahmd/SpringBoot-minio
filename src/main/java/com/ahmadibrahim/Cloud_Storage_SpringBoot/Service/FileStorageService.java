@@ -2,7 +2,9 @@ package com.ahmadibrahim.Cloud_Storage_SpringBoot.Service;
 
 import com.ahmadibrahim.Cloud_Storage_SpringBoot.Dto.FileResponse;
 import com.ahmadibrahim.Cloud_Storage_SpringBoot.Model.FileMetadata;
+import com.ahmadibrahim.Cloud_Storage_SpringBoot.Model.User;
 import com.ahmadibrahim.Cloud_Storage_SpringBoot.Repository.FileMetadataRepository;
+import com.ahmadibrahim.Cloud_Storage_SpringBoot.Repository.UserRepository;
 import io.minio.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,21 +24,23 @@ public class FileStorageService {
 
     private final MinioClient minioClient;
     private final FileMetadataRepository fileMetadataRepository;
+    private final UserRepository userRepository;
 
     @Value("${minio.bucket-name}")
     private String bucketName;
 
     @Transactional
-    public FileMetadata saveFile(MultipartFile file, Long ownerId) throws Exception{
+    public FileMetadata saveFile(MultipartFile file, Long userId) throws Exception{
+        User user = ensureUserIsExists(userId);
         ensureBucketIsExists();
 
-        String path = ownerId + "/" + file.getOriginalFilename();
+        String path = user.getId() + "/" + file.getOriginalFilename();
         FileMetadata metadata = new FileMetadata();
         metadata.setName(file.getOriginalFilename());
         metadata.setPath(path);
         metadata.setSize(file.getSize());
         metadata.setMimeType(file.getContentType());
-        metadata.setOwnerId(ownerId);
+        metadata.setUsers(user);
         FileMetadata savedMetadata = fileMetadataRepository.save(metadata);
         minioClient.putObject(
                 PutObjectArgs.builder()
@@ -66,6 +70,12 @@ public class FileStorageService {
         if (!exists){
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
         }
+    }
+
+    public User ensureUserIsExists(Long userId) throws Exception{
+        return userRepository.findById(userId)
+                .orElseThrow(()-> new RuntimeException("User with id " + userId + " not found"));
+
     }
 
     public List<FileResponse> getAllFiles(){

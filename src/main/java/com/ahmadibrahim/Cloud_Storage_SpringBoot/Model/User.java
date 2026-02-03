@@ -35,6 +35,12 @@ public class User implements UserDetails {
     )
     private String password;
 
+    @OneToMany(
+            mappedBy = "users",
+            cascade = CascadeType.ALL
+    )
+    private List<FileMetadata> fileMetadata;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

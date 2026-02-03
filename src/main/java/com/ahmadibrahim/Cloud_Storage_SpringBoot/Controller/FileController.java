@@ -29,13 +29,13 @@ public class FileController {
     @PostMapping("/upload")
     public ResponseEntity<UploadResponse> upload(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("ownerId") Long ownerId
+            @RequestParam("user_id") Long userId
     ) throws Exception{
         if (file.isEmpty()){
             return ResponseEntity.badRequest().build();
         }
 
-        FileMetadata metadata = fileStorageService.saveFile(file, ownerId);
+        FileMetadata metadata = fileStorageService.saveFile(file, userId);
         return ResponseEntity.ok(UploadResponse.builder()
                 .fileId(metadata.getId().toString())
                 .fileName(metadata.getName())

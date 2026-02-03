@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Entity
 @Data
-@Table (name = "files")
+@Table (name = "file_metadata")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -22,5 +22,12 @@ public class FileMetadata {
     private String path;
     private Long size;
     private String mimeType;
-    private Long ownerId;
+
+    @ManyToOne(
+            fetch = FetchType.LAZY
+    )
+    @JoinColumn(
+            name = "user_id"
+    )
+    private User users;
 }
