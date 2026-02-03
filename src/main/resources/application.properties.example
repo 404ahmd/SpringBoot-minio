@@ -1,0 +1,21 @@
+spring.application.name=Cloud-Storage-SpringBoot
+
+# MySql
+#spring.datasource.url=jdbc:mysql://localhost:3306/your_database_name?createDatabaseIfNotExist=true
+#spring.datasource.username=your_database_username (root)
+#spring.datasource.password=your_database_password
+#spring.jpa.hibernate.ddl-auto=update
+
+# miniIo
+#minio.endpoint=http://localhost:9000
+#minio.access-key=your_minio_username
+#minio.secret-key=your_minio_password
+#minio.bucket-name=springboot-files
+
+#JWT token
+#jwt.secret=YOUR SECRET KEY
+#jwt.expiration=86400000
+
+#file size limit
+spring.servlet.multipart.max-file-size=10MB
+spring.servelt.multipart.max-request-size=10MB
