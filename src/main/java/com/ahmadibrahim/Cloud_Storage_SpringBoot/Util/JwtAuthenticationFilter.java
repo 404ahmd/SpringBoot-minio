@@ -53,16 +53,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
         // Skip filter untuk endpoint publik dan HTML pages
-        return path.startsWith("/auth/") ||
-                path.equals("/login") ||
-                path.equals("/register") ||
-                path.equals("/dashboard") ||
-                path.startsWith("/css/") ||
-                path.startsWith("/js/") ||
-                path.startsWith("/font/") ||
-                path.startsWith("/img/") ||
-                path.startsWith("/vendor/") ||
-                path.startsWith("/components/");
+        boolean isNotApi = !path.startsWith("/api/");
+        boolean isAuth = path.startsWith("/api/auth/") || path.startsWith("/auth/");
+
+        return isNotApi || isAuth;
     }
 
 }

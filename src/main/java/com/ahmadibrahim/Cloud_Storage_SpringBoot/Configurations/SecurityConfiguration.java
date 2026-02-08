@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.ahmadibrahim.Cloud_Storage_SpringBoot.Service.CustomUserDetailsService;
 import com.ahmadibrahim.Cloud_Storage_SpringBoot.Util.JwtAuthenticationFilter;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -44,15 +45,37 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/login", "/register", "/dashboard", "/css/**", "/js/**", "/font/**", "/img/**", "/vendor/**", "/components/**")
-                        .permitAll()
+                        .requestMatchers("/auth/**").permitAll() // authentication
+                        .requestMatchers(
+                                "/login",
+                                "/register",
+                                "/dashboard",
+                                "/files"
+                            )
+                        .permitAll() // page
+                        .requestMatchers("/css/**", "/js/**", "/font/**", "/img/**", "/vendor/**", "/components/**")
+                        .permitAll() // static resources
+                        .requestMatchers("/api/**").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            String requestUri = request.getRequestURI();
+
+                            // Untuk API endpoints, return JSON error
+                            if (requestUri.startsWith("/api/")) {
+                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                response.setContentType("application/json");
+                                response.getWriter().write(
+                                        "{\"error\":\"Unauthorized\",\"message\":\"Authentication required. Please login.\"}");
+                            } else {
+                                response.sendRedirect("/login");
+                            }
+                        }))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
 
 }

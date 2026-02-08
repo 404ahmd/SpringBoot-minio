@@ -22,7 +22,7 @@
             <div class="card">
                 <div class="card-body text-center">
                     <div class="mb-4">
-                        <img class="brand" th:src="@{/img/bootstraper-logo.png}" alt="bootstraper logo">
+                        <h4>SpringBoot Minio</h4>
                     </div>
                     <h6 class="mb-4 text-muted">Login to your account</h6>
                     <form id="loginForm">
@@ -100,7 +100,7 @@
                         localStorage.setItem('authToken', response.token);
                         localStorage.setItem('username', response.username);
                         console.log("Token : ", response.token);
-                       
+                        console.log("Username : ", response.username);
                         // Redirect ke dashboard setelah 1 detik
                         setTimeout(function () {
                             window.location.href = '/dashboard'; // Sesuaikan dengan route dashboard Anda
@@ -130,12 +130,12 @@
                 });
             });
             // Check jika sudah login (ada token)
-            const token = localStorage.getItem('authToken');
-            if (token) {
-                // Validasi token dengan backend (optional)
-                // Jika valid, redirect ke dashboard
-                window.location.href = '/dashboard';
-            }
+//            const token = localStorage.getItem('authToken');
+//            if (token) {
+//                // Validasi token dengan backend (optional)
+//                // Jika valid, redirect ke dashboard
+//                window.location.href = '/dashboard';
+//            }
         });
     </script>
 </body>

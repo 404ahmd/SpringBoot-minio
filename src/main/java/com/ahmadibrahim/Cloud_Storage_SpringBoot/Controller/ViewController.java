@@ -20,4 +20,9 @@ public class ViewController {
     public String dashboardPage(){
         return "index";
     }
+
+    @GetMapping("/files")
+    public String filesPage(){
+        return "files";
+    }
 }

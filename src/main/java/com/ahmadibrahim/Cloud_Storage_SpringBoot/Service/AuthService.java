@@ -45,6 +45,7 @@ public class AuthService {
 
         if (authentication.isAuthenticated()){
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(authRequest.getUsername());
+
             String token = jwtUtil.generateToken(userDetails);
             AuthResponse authResponse = new AuthResponse();
             authResponse.setToken(token);

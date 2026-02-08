@@ -1,0 +1,15 @@
+<div th:fragment="sidebar">
+    <nav id="sidebar" class="active">
+        <div class="sidebar-header">
+            <h4 style="color: black; font-family: sans-serif;">SpringBoot Minio</h4>
+        </div>
+        <ul class="list-unstyled components text-secondary">
+            <li>
+                <a th:href="@{/dashboard}"><i class="fas fa-home"></i>Dashboard</a>
+            </li>
+            <li>
+                <a th:href="@{/files}"><i class="fas fa-folder-open"></i>My Files</a>
+            </li>
+        </ul>
+    </nav>
+</div>

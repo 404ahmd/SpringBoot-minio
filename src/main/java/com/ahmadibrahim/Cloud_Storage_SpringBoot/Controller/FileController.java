@@ -1,27 +1,31 @@
 package com.ahmadibrahim.Cloud_Storage_SpringBoot.Controller;
 
-import com.ahmadibrahim.Cloud_Storage_SpringBoot.Dto.FileResponse;
-import com.ahmadibrahim.Cloud_Storage_SpringBoot.Dto.UploadResponse;
-import com.ahmadibrahim.Cloud_Storage_SpringBoot.Model.FileMetadata;
-import com.ahmadibrahim.Cloud_Storage_SpringBoot.Repository.FileMetadataRepository;
-import com.ahmadibrahim.Cloud_Storage_SpringBoot.Service.FileStorageService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
+import java.util.List;
+
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
+import com.ahmadibrahim.Cloud_Storage_SpringBoot.Dto.FileResponse;
+import com.ahmadibrahim.Cloud_Storage_SpringBoot.Dto.UploadResponse;
+import com.ahmadibrahim.Cloud_Storage_SpringBoot.Model.FileMetadata;
+import com.ahmadibrahim.Cloud_Storage_SpringBoot.Service.FileStorageService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/files")
+@RequestMapping("/api/files")
 @RequiredArgsConstructor
 public class FileController {
     private final FileStorageService fileStorageService;
@@ -29,13 +33,16 @@ public class FileController {
     @PostMapping("/upload")
     public ResponseEntity<UploadResponse> upload(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("user_id") Long userId
+            Authentication authentication
     ) throws Exception{
         if (file.isEmpty()){
             return ResponseEntity.badRequest().build();
         }
 
-        FileMetadata metadata = fileStorageService.saveFile(file, userId);
+        String username = authentication.getName();
+        System.out.println("User " + username + " is uploading file with");
+
+        FileMetadata metadata = fileStorageService.saveFile(file, username);
         return ResponseEntity.ok(UploadResponse.builder()
                 .fileId(metadata.getId().toString())
                 .fileName(metadata.getName())
@@ -44,13 +51,25 @@ public class FileController {
     }
 
     @GetMapping("/download/{fileId}")
-    public ResponseEntity<byte[]> donwload(@PathVariable Long fileId) throws Exception{
+    public ResponseEntity<Resource> donwload(@PathVariable Long fileId, @RequestParam(required = false) String token, Authentication authentication) throws Exception{
+        String username = authentication != null ? authentication.getName() : "anonymous";
+        System.out.println("User " + username + " is downloading file with ID: " + fileId);
+
         FileMetadata metadata = fileStorageService.getMetadata(fileId);
-        byte[] fileData = fileStorageService.downloadFile(metadata.getPath());
+        if (metadata == null){
+            return ResponseEntity.notFound().build();
+        }
+
+        Resource resource = fileStorageService.download(metadata.getPath());
+        if (resource == null){
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(metadata.getMimeType()))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + metadata.getName() + "\"")
-                .body(fileData);
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + metadata.getName() + "\"")
+                .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(metadata.getSize()))
+                .body(resource);
     }
 
     @DeleteMapping("/delete/{fileId}")
@@ -60,8 +79,17 @@ public class FileController {
     }
 
     @GetMapping("/get/all")
-    public ResponseEntity<List<FileResponse>> listAllFiles() {
-        return ResponseEntity.ok(fileStorageService.getAllFiles());
+    public ResponseEntity<List<FileResponse>> listAllFiles(Authentication authentication) {
+        try {
+            String username = authentication.getName();
+            System.out.println("User " + username + " is fetching all files");
+            
+            List<FileResponse> files = fileStorageService.getAllFiles();
+            return ResponseEntity.ok(files);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
 
