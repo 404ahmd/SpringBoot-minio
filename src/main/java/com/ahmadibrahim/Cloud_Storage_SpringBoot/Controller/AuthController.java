@@ -2,6 +2,7 @@ package com.ahmadibrahim.Cloud_Storage_SpringBoot.Controller;
 
 import java.util.Map;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,12 +24,6 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/register")
-    public ResponseEntity<?>register(@RequestBody AuthRequest authRequest){
-        String result = authService.register(authRequest);
-        return ResponseEntity.ok(Map.of("Message", result));
-    }
-
     @PostMapping("/login")
     public ResponseEntity<?>login(@RequestBody AuthRequest authRequest){
         try{
@@ -38,6 +33,11 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("Error", "Login Gagal" + e.getMessage()));
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request){
+        return ResponseEntity.ok(Map.of("message", "Logout berhasil"));
     }
 
     @GetMapping("/sayHello")

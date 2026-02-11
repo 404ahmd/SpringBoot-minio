@@ -7,6 +7,7 @@
 -->
 <html lang="en">
 <div th:replace="fragments/header::header"></div>
+
 <body>
     <div class="wrapper">
         <!-- sidebar navigation component -->
@@ -53,7 +54,12 @@
             if (!token) {
                 window.location.href = "/login";
             }
+
+            $('#displayUsername').text(username);
         })
+    </script>
+
+    <script>
     </script>
 </body>
 
