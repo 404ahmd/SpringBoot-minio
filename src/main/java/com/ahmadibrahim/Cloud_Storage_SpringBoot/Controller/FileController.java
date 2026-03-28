@@ -3,7 +3,9 @@ package com.ahmadibrahim.Cloud_Storage_SpringBoot.Controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.catalina.webresources.FileResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,8 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ahmadibrahim.Cloud_Storage_SpringBoot.Dto.FileResponse;
 import com.ahmadibrahim.Cloud_Storage_SpringBoot.Model.FileMetadata;
 import com.ahmadibrahim.Cloud_Storage_SpringBoot.Service.FileStorageService;
-
-import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 
@@ -65,19 +65,19 @@ public class FileController {
     }
 
     @GetMapping("/download/{fileId}")
-    public ResponseEntity<?> downloadFile(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<?> downloadFile(@PathVariable("fileId") Long fileId, Authentication authentication) {
         try {
             String username = authentication.getName();
-            System.out.println("User " + username + " is downloading file with ID: " + id);
+            System.out.println("User " + username + " is downloading file with ID: " + fileId);
             FileMetadata fileMetadata;
             try {
-                fileMetadata = fileStorageService.getFileMetadataById(id, username);
+                fileMetadata = fileStorageService.getFileMetadataById(fileId, username);
             } catch (RuntimeException e) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body(Map.of("error", "access denied"));
             }
 
-            Resource resource = fileStorageService.download(id, username);
+            Resource resource = fileStorageService.download(fileId, username);
             if (resource == null) {
                 return ResponseEntity.notFound().build();
             }
@@ -132,6 +132,59 @@ public class FileController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<?>searchFiles(
+            @RequestParam("q") String keyword,
+            Authentication authentication
+    ){
+        try {
+            if (keyword == null || keyword.trim().isEmpty()){
+                return ResponseEntity.ok(List.of());
+            }
+            String username = authentication.getName();
+            List<FileResponse> results = fileStorageService.searchByFileName(keyword.trim(), username);
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<FileResponse>> filterFiles(@RequestParam("type") String type, Authentication authentication){
+        String username = authentication.getName();
+        List<FileResponse> results = fileStorageService.searchByType(type, username);
+        return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("/get/sorted")
+    public ResponseEntity<List<FileResponse>>listAllFiles(
+            @RequestParam(value = "sortBy", defaultValue = "name") String sortBy,
+            Authentication authentication
+    ){
+        try{
+            String username = authentication.getName();
+            List<FileResponse> responses = fileStorageService.getAllFilesSorted(username, sortBy);
+            return ResponseEntity.ok(responses);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

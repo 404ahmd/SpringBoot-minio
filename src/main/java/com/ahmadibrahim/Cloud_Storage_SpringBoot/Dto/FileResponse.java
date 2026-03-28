@@ -2,6 +2,8 @@ package com.ahmadibrahim.Cloud_Storage_SpringBoot.Dto;
 
 import lombok.*;
 
+@Getter
+@Setter
 @Data
 @AllArgsConstructor
 public class FileResponse {

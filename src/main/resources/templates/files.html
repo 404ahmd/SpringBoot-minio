@@ -9,182 +9,237 @@
 <div th:replace="fragments/header::header"></div>
 
 <body>
-<div class="wrapper">
-    <!-- sidebar navigation component -->
-    <div th:replace="fragments/sidebar::sidebar"></div>
-    <!-- end of sidebar component -->
-    <div id="body" class="active">
-        <!-- navbar navigation component -->
-        <div th:replace="fragments/navbar::navbar"></div>
-        <!-- end of navbar navigation -->
+    <div class="wrapper">
+        <!-- sidebar navigation component -->
+        <div th:replace="fragments/sidebar::sidebar"></div>
+        <!-- end of sidebar component -->
+        <div id="body" class="active">
+            <!-- navbar navigation component -->
+            <div th:replace="fragments/navbar::navbar"></div>
+            <!-- end of navbar navigation -->
 
-        <!-- content -->
-        <div class="content">
-            <div class="container-fluid px-4">
-                <!-- Main Card Wrapper -->
-                <div class="card shadow-sm">
-                    <div class="card-body p-4">
-                        <!-- Page Header -->
-                        <div class="row mb-4">
-                            <div class="col-md-12">
-                                <div class="page-pretitle">Storage</div>
-                                <h2 class="page-title">My Files</h2>
-                            </div>
-                        </div>
-
-                        <!-- Alert Messages -->
-                        <div class="row">
-                            <div class="col-12">
-                                <div id="alertMessage" class="alert d-none" role="alert"></div>
-                            </div>
-                        </div>
-
-                        <!-- Filter & Search -->
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                    <input type="text" id="searchInput" class="form-control"
-                                           placeholder="Search files...">
+            <!-- content -->
+            <div class="content">
+                <div class="container-fluid px-4">
+                    <!-- Main Card Wrapper -->
+                    <div class="card shadow-sm">
+                        <div class="card-body p-4">
+                            <!-- Page Header -->
+                            <div class="row mb-4">
+                                <div class="col-md-12">
+                                    <div class="page-pretitle">Storage</div>
+                                    <h2 class="page-title">My Files</h2>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <select id="filterType" class="form-select">
-                                    <option value="">All Types</option>
-                                    <option value="image">Images</option>
-                                    <option value="video">Videos</option>
-                                    <option value="audio">Audio</option>
-                                    <option value="document">Documents</option>
-                                    <option value="other">Others</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <select id="sortBy" class="form-select">
-                                    <option value="name">Name (A-Z)</option>
-                                    <option value="name-desc">Name (Z-A)</option>
-                                    <option value="size">Size (Small to Large)</option>
-                                    <option value="size-desc">Size (Large to Small)</option>
-                                </select>
-                            </div>
-                        </div>
 
-                        <!-- Statistics Cards -->
-                        <div class="row mb-4">
-                            <div class="col-md-3">
-                                <div class="card shadow">
-                                    <div class="card-body">
-                                        <h6 class="text-muted">Total Files</h6>
-                                        <h3 id="totalFiles">0</h3>
+                            <!-- Alert Messages -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div id="alertMessage" class="alert d-none" role="alert"></div>
+                                </div>
+                            </div>
+
+                            <!-- Filter & Search -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <!-- Tambahkan position relative pada wrapper -->
+                                    <div class="input-group" style="position: relative;">
+                                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                        <input type="text" id="searchInput" class="form-control"
+                                            placeholder="Search files..." autocomplete="off" />
+
+                                        <!-- Dropdown hasil search -->
+                                        <div id="dropdown-hasil" style="
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 9999;
+        max-height: 300px;
+        overflow-y: auto;
+    "></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <select id="filterType" class="form-select">
+                                        <option value="">All Types</option>
+                                        <option value="image">Images</option>
+                                        <option value="video">Videos</option>
+                                        <option value="audio">Audio</option>
+                                        <option value="document">Documents</option>
+                                        <option value="other">Others</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select id="sortBy" class="form-select">
+                                        <option value="name">Name (A-Z)</option>
+                                        <option value="name-desc">Name (Z-A)</option>
+                                        <option value="size">Size (Small to Large)</option>
+                                        <option value="size-desc">Size (Large to Small)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Statistics Cards -->
+                            <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <div class="card shadow">
+                                        <div class="card-body">
+                                            <div class="row d-flex">
+                                                <div class="col">
+                                                    <h6 class="text-muted">Total Files</h6>
+                                                    <h3 id="totalFiles">0</h3>
+                                                </div>
+                                                <div class="col ms-2">
+                                                    <span class="fa-solid fa-file"
+                                                        style="color: rgb(0, 97, 154); font-size: 4rem;"></span>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card shadow">
+                                        <div class="card-body">
+                                            <div class="row d-flex">
+                                                <div class="col">
+                                                    <h6 class="text-muted">Total Size</h6>
+                                                    <h3 id="totalSize">0 MB</h3>
+                                                </div>
+                                                <div class="col ms-2">
+                                                    <span class="fa-solid fa-compact-disc"
+                                                        style="color: rgb(0, 97, 154); font-size: 4rem;"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card shadow">
+                                        <div class="card-body">
+                                            <div class="row d-flex">
+                                                <div class="col">
+                                                    <h6 class="text-muted">Images</h6>
+                                                    <h3 id="totalImages">0</h3>
+                                                </div>
+                                                <div class="col ms-2">
+                                                    <span class="fa-solid fa-image"
+                                                        style="color: rgb(0, 97, 154); font-size: 4rem;"></span>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card shadow">
+                                        <div class="card-body">
+                                            <div class="row d-flex">
+                                                <div class="col">
+                                                    <h6 class="text-muted">Documents</h6>
+                                                    <h3 id="totalDocuments">0</h3>
+                                                </div>
+                                                <div class="col ms-2">
+                                                    <span class="fa-solid fa-file-lines"
+                                                        style="color: rgb(0, 97, 154); font-size: 4rem;"></span>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="card shadow">
-                                    <div class="card-body">
-                                        <h6 class="text-muted">Total Size</h6>
-                                        <h3 id="totalSize">0 MB</h3>
-                                    </div>
+
+                            <!-- Loading Spinner -->
+                            <div class="loading-spinner">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-3">Loading your files...</p>
+                            </div>
+
+                            <!-- Empty State -->
+                            <div class="empty-state">
+                                <i class="fas fa-folder-open"></i>
+                                <h4>No files found</h4>
+                                <p>Upload your first file to get started</p>
+                            </div>
+
+                            <!-- Upload Button and Progress -->
+                            <div class="mb-3">
+                                <button type="button" id="btnUploadTrigger" class="btn btn-primary">
+                                    <i class="fas fa-cloud-upload-alt"></i> Upload File
+                                </button>
+
+                                <input type="file" id="fileInput" style="display: none;" multiple>
+
+                                <div class="progress mt-2" style="display: none; height: 10px;">
+                                    <div id="uploadProgress"
+                                        class="progress-bar progress-bar-striped progress-bar-animated"
+                                        role="progressbar" style="width: 0%"></div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="card shadow">
-                                    <div class="card-body">
-                                        <h6 class="text-muted">Images</h6>
-                                        <h3 id="totalImages">0</h3>
-                                    </div>
-                                </div>
+
+                            <!-- Files Grid -->
+                            <div class="row" id="filesContainer">
+                                <!-- Files will be loaded here dynamically -->
                             </div>
-                            <div class="col-md-3">
-                                <div class="card shadow">
-                                    <div class="card-body">
-                                        <h6 class="text-muted">Documents</h6>
-                                        <h3 id="totalDocuments">0</h3>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Loading Spinner -->
-                        <div class="loading-spinner">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <p class="mt-3">Loading your files...</p>
-                        </div>
-
-                        <!-- Empty State -->
-                        <div class="empty-state">
-                            <i class="fas fa-folder-open"></i>
-                            <h4>No files found</h4>
-                            <p>Upload your first file to get started</p>
-                        </div>
-
-                        <!-- Upload Button and Progress -->
-                        <div class="mb-3">
-                            <button type="button" id="btnUploadTrigger" class="btn btn-primary">
-                                <i class="fas fa-cloud-upload-alt"></i> Upload File
-                            </button>
-
-                            <input type="file" id="fileInput" style="display: none;" multiple>
-
-                            <div class="progress mt-2" style="display: none; height: 10px;">
-                                <div id="uploadProgress"
-                                     class="progress-bar progress-bar-striped progress-bar-animated"
-                                     role="progressbar" style="width: 0%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Files Grid -->
-                        <div class="row" id="filesContainer">
-                            <!-- Files will be loaded here dynamically -->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- message alert -->
-<div class="position-fixed bottom-0 right-0 p-3" style="z-index: 5; right: 0; bottom: 0;">
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true"
-         data-bs-delay="5000">
-        <div class="toast-header">
-            <svg class="bd-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
-                 aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
-                <rect width="100%" height="100%" fill="#007aff"></rect>
-            </svg>
-            <strong class="me-auto">Notification</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-            Welcome back!
+    <!-- message alert -->
+    <div class="position-fixed bottom-0 right-0 p-3" style="z-index: 5; right: 0; bottom: 0;">
+        <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true"
+            data-bs-delay="5000">
+            <div class="toast-header">
+                <svg class="bd-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
+                    <rect width="100%" height="100%" fill="#007aff"></rect>
+                </svg>
+                <strong class="me-auto">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                Welcome back!
+            </div>
         </div>
     </div>
-</div>
-<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
-<script th:src="@{/vendor/bootstrap/js/bootstrap.min.js}"></script>
-<script th:src="@{/js/initiate-toast.js}"></script>
-<script th:src="@{/js/script.js}"></script>
+    <script th:src="@{/vendor/jquery/jquery.min.js}"></script>
+    <script th:src="@{/vendor/bootstrap/js/bootstrap.min.js}"></script>
+    <script th:src="@{/js/initiate-toast.js}"></script>
+    <script th:src="@{/js/script.js}"></script>
 
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 </body>
 <script>
     $(document).ready(function () {
         const username = localStorage.getItem('username');
         const token = localStorage.getItem('authToken');
-        console.log("Token : ", token);
+        // console.log("Token : ", token);
 
         if (!token) {
             window.location.href = "/login";
         }
 
-        console.log("Username : ", username);
+        // console.log("Username : ", username);
         $('#navUsername').text(username);
 
         $.ajaxSetup({
@@ -211,7 +266,7 @@
                 type: "GET",
                 success: function (files) {
                     allFiles = files;
-                    console.log("All files : ", allFiles);
+                    // console.log("All files : ", allFiles);
                     $('.loading-spinner').hide();
 
                     if (files.length === 0) {
@@ -240,7 +295,7 @@
                 const fileColor = getFileColor(file.mimeType);
                 const fileSize = formatFileSize(file.size);
                 const fileType = getFileTypeBadge(file.mimeType);
-                console.log("File name : ", file.fileName);
+                // console.log("File name : ", file.fileName);
 
                 let previewUrl;
 
@@ -262,7 +317,6 @@
                                 <h6 class="card-title text-truncate" title="${file.fileName}">
                                     ${file.fileName}
                                 </h6>
-
                                 <div class="file-actions mt-3">
                                     <button class="btn btn-sm btn-primary flex-fill view-file-btn"
                                             data-file-id="${file.id}">
@@ -378,30 +432,8 @@
 
         $(document).on('click', '.download-file-btn', function () {
             const id = $(this).data('file-id');
-            console.log("File id : ", id);
-
-            const token = localStorage.getItem('authToken');
-
             if (id) {
-                $.ajax({
-                    url: `/api/files/download/${id}`,
-                    method: 'GET',
-                    xhrFields: { responseType: 'blob' }, // Penting: Tangani data biner
-                    success: function (data, status, xhr) {
-                        // Ambil nama file dari header jika ada, atau default
-                        const filename = xhr.getResponseHeader('Content-Disposition')
-                            ?.split('filename=')[1]?.replace(/"/g, '') || 'downloaded_file';
-
-                        const blob = new Blob([data]);
-                        const link = document.createElement('a');
-                        link.href = window.URL.createObjectURL(blob);
-                        link.download = filename;
-                        link.click();
-                    },
-                    error: function () {
-                        alert("Gagal mendownload file. Pastikan Anda memiliki akses.");
-                    }
-                });
+                downloadFile(id);
             }
         });
 
@@ -421,7 +453,7 @@
 
         function uploadFile(files) {
             const formData = new FormData();
-            for(let i = 0; i < files.length; i++){
+            for (let i = 0; i < files.length; i++) {
                 formData.append("files", files[i]);
             }
 
@@ -457,7 +489,7 @@
                         showConfirmButton: false,
                         timer: 2000
                     });
-                    console.log("Metadata : ", response);
+                    // console.log("Metadata : ", response);
                     location.reload();
                 },
                 error: function (xhr) {
@@ -472,16 +504,55 @@
             })
         }
 
-        $(document).on('click', '.delete-file-btn',function(){
-        const id = $(this).data('file-id');
-        console.log("data id saat delete => ", id);
+        function downloadFile(fileId) {
+            const token = localStorage.getItem('authToken');
+
+            // Menampilkan loading sederhana (opsional)
+            console.log(`Memulai download untuk ID: ${fileId}`);
+            if (fileId) {
+                $.ajax({
+                    url: `/api/files/download/${fileId}`,
+                    method: 'GET',
+                    xhrFields: { responseType: 'blob' }, // Penting: Tangani data biner
+                    headers: {
+                        'Authorization': 'Bearer' + token
+                    },
+                    success: function (data, status, xhr) {
+                        // Ambil nama file dari header jika ada, atau default
+                        const filename = xhr.getResponseHeader('Content-Disposition')
+                            ?.split('filename=')[1]?.replace(/"/g, '') || 'downloaded_file';
+
+                        const blob = new Blob([data]);
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = filename;
+                        document.body.appendChild(link);
+                        link.click();
+
+                        setTimeout(() => {
+                            window.URL.revokeObjectURL(url);
+                            link.remove();
+                        }, 100);
+                    },
+                    error: function () {
+                        alert("Gagal mendownload file. Pastikan Anda memiliki akses.");
+                    }
+                });
+            }
+        }
+
+        $(document).on('click', '.delete-file-btn', function () {
+            const id = $(this).data('file-id');
+            // console.log("data id saat delete => ", id);
             Swal.fire({
                 title: "Konfirmasi Hapus",
                 text: "Apakah yakin ingin hapus file ini ?",
                 icon: 'warning',
                 showCancelButton: true
             }).then((result) => {
-                if(result.isConfirmed){
+                if (result.isConfirmed) {
                     Swal.fire({
                         title: 'Menghapus ...',
                         allowOutsideClick: false,
@@ -494,29 +565,291 @@
                     $.ajax({
                         url: `/api/files/delete/${id}`,
                         type: "DELETE",
-                        beforeSend: function(xhr){
+                        beforeSend: function (xhr) {
                             xhr.setRequestHeader('Authorization', 'Bearer ' + token);
                         },
-                        success: function(response){
+                        success: function (response) {
                             Swal.fire({
-                                    icon: 'success',
-                                    title: 'Terhapus!',
-                                    text: response.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
+                                icon: 'success',
+                                title: 'Terhapus!',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
                             });
                             location.reload();
                             loadFiles();
-                            console.log("delete response message => ", response.message);
+                            // console.log("delete response message => ", response.message);
                         },
-                        error: function(xhr){
+                        error: function (xhr) {
                             const error = xhr.responseJSON ? xhr.responseJSON.error : "Gagal menghapus file";
                             alert("Error: " + error);
                         }
                     })
                 }
             });
-        })
+        });
+
+        const inputSearch = document.getElementById("searchInput"); // ✅ sesuai id-mu
+        const dropdown = document.getElementById("dropdown-hasil");
+
+        let debounceTimer = null;
+
+        // Validasi elemen ada
+        if (!inputSearch || !dropdown) return;
+
+        // ── Listen input ─────────────────────────────────────────────────────
+        inputSearch.addEventListener("input", function () {
+            const keyword = this.value.trim();
+
+            clearTimeout(debounceTimer);
+
+            if (keyword.length === 0) {
+                tutupDropdown();
+                return;
+            }
+
+            debounceTimer = setTimeout(() => cariFile(keyword), 300);
+        });
+
+        // ── Tutup jika klik luar ─────────────────────────────────────────────
+        document.addEventListener("click", function (e) {
+            if (!inputSearch.contains(e.target) && !dropdown.contains(e.target)) {
+                tutupDropdown();
+            }
+        });
+
+        // ── Keyboard navigation ──────────────────────────────────────────────
+        inputSearch.addEventListener("keydown", function (e) {
+            const items = dropdown.querySelectorAll(".item-file");
+            const active = dropdown.querySelector(".item-file.active");
+            let index = Array.from(items).indexOf(active);
+
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                if (index < items.length - 1) {
+                    active?.classList.remove("active");
+                    items[index + 1].classList.add("active");
+                    items[index + 1].scrollIntoView({ block: "nearest" });
+                }
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                if (index > 0) {
+                    active?.classList.remove("active");
+                    items[index - 1].classList.add("active");
+                }
+            } else if (e.key === "Enter" && active) {
+                active.click();
+            } else if (e.key === "Escape") {
+                tutupDropdown();
+            }
+        });
+
+        // ── AJAX ke backend ──────────────────────────────────────────────────
+        function cariFile(keyword) {
+            const token = localStorage.getItem("authToken"); // ✅ ambil token dari localStorage
+            // console.log("TOken : ", token);
+
+            if (!token) {
+                console.warn("Token tidak ditemukan, user belum login");
+                return;
+            }
+
+            fetch(`/api/files/search?q=${encodeURIComponent(keyword)}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token  // ✅ kirim JWT di header
+                }
+                // credentials: "include" dihapus karena tidak relevan untuk JWT
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("Response tidak OK: " + res.status);
+                    // console.log("Response JSON : ", res.json);
+                    return res.json();
+                })
+                .then(data => {
+                    // console.log("RAW DATA : ", data),
+                    // console.log("Tipe data : ", typeof data),
+                    // console.log("Item pertama : ", data[0]),
+                    tampilkanDropdown(data)
+                })
+                .catch(err => {
+                    console.error("Search error:", err);
+                    tutupDropdown();
+                });
+        }
+
+        // ── Render dropdown ──────────────────────────────────────────────────
+        function tampilkanDropdown(files) {
+            dropdown.innerHTML = "";
+
+            if (!files || files.length === 0) {
+                dropdown.innerHTML = `<div class="no-result">📭 File tidak ditemukan</div>`;
+                dropdown.style.display = "block";
+                return;
+            }
+
+            files.forEach(file => {
+                const item = document.createElement("div");
+                const fileName = file.fileName || "Unknown File";
+                const highlightedName = highlightKeyword(fileName, inputSearch.value.trim());
+                item.classList.add("item-file");
+                item.innerHTML = `
+                    <div class="file-icon-wrapper">
+                        ${getFileIcon(file.mimeType)}
+                    </div>
+                    <div class="file-details">
+                        <div class="file-name-highlight">${highlightedName}</div>
+                            <div class="file-meta">
+                                <span>${formatBytes(file.size)}</span>
+                                <span class="separator">&bull;</span>
+                                <span>${file.mimeType || "-"}</span>
+                            </div>
+                    </div>
+                `;
+
+                item.addEventListener("click", () => {
+                    downloadFile(file.id);
+                    inputSearch.value = file.name;
+                    tutupDropdown();
+                });
+
+                dropdown.appendChild(item);
+            });
+
+            dropdown.style.display = "block";
+        }
+
+        // ── Helpers ──────────────────────────────────────────────────────────
+        function tutupDropdown() {
+            dropdown.innerHTML = "";
+            dropdown.style.display = "none";
+        }
+
+        function highlightKeyword(text, keyword) {
+            if (!text) return "";           // ← guard jika undefined/null
+            if (!keyword) return text;
+            const regex = new RegExp(`(${escapeRegex(keyword)})`, "gi");
+            return text.replace(regex, `<mark>$1</mark>`);
+        }
+
+        function escapeRegex(str) {
+            return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        }
+
+        function formatBytes(bytes) {
+            if (!bytes) return "0 B";
+            if (bytes < 1024) return bytes + " B";
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
+            return (bytes / 1048576).toFixed(1) + " MB";
+        }
+
+        function getFileIcon(mimeType) {
+            if (!mimeType) return "📄";
+            if (mimeType.startsWith("image/")) return "🖼️";
+            if (mimeType.startsWith("video/")) return "🎬";
+            if (mimeType.startsWith("audio/")) return "🎵";
+            if (mimeType.includes("pdf")) return "📕";
+            if (mimeType.includes("zip") || mimeType.includes("rar")) return "🗜️";
+            if (mimeType.includes("word")) return "📝";
+            if (mimeType.includes("sheet") || mimeType.includes("excel")) return "📊";
+            return "📄";
+        }
+
+        //filtering file by type
+        $('#filterType').on('change', function(){
+            const selectedType = $(this).val();
+            fetchFilteredFiles(selectedType);
+        });
+
+        function fetchFilteredFiles(type){
+            const token = localStorage.getItem("authToken");
+            console.log("Token from filtered", token);
+
+            $.ajax({
+                url : `/api/files/filter?type=${type}`,
+                method: "GET",
+                headers: {
+                    'Authorization' : 'Bearer' + token,
+                },
+                success: function(data){
+                    renderFileList(data);
+                    //console.log("Data Filtered", data);
+                },
+                error: function(){
+                    alert("Error");
+                }
+            })
+        }
+
+        function renderFileList(files){
+            const container = $('#filesContainer');
+            container.empty();
+
+            if(files.length === 0){
+                container.append('<p class="text-center">Tidak ada file ditemukan</p>')
+            }
+
+            files.forEach(file => {
+                 const fileCard = `
+                    <div class="col-md-4 col-lg-3 mb-4 mt-4">
+                        <div class="card shadow-lg file-card" data-file-id="${file.id}">
+                            <div class="card-body">
+                                <div class="text-center">
+
+                                </div>
+                                <h6 class="card-title text-truncate" title="${file.fileName}">
+                                    ${file.fileName}
+                                </h6>
+
+                                <div class="file-actions mt-3">
+                                    <button class="btn btn-sm btn-primary flex-fill view-file-btn"
+                                            data-file-id="${file.id}">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                    <button class="btn btn-sm btn-success download-file-btn"
+                                            data-file-id="${file.id}">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger delete-file-btn"
+                                            data-file-id="${file.id}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.append(fileCard);
+            });
+        }
+
+        $('#sortBy').on('change', function(){
+            //alert("HODUP JOKOWI");
+            const sortValue = $(this).val();
+            console.log("sort value : ", sortValue);
+            loadFiles(sortValue);
+        });
+
+        function loadFiles(sortBy = "name"){
+            const token = localStorage.getItem("authToken");
+            $.ajax({
+                url: `/api/files/get/sorted?sortBy=${sortBy}`,
+                method: "GET",
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+                success: function(data){
+                $('.empty-state').hide();
+                $('.loading-spinner').hide();
+                    renderFileList(data);
+                    updateStatistics(data);
+                },
+                error: function(){
+                    alert("Gagal memuat data");
+                }
+            })
+        }
     })
 </script>
 

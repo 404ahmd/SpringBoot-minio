@@ -1,18 +1,22 @@
 package com.ahmadibrahim.Cloud_Storage_SpringBoot.Service;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.ahmadibrahim.Cloud_Storage_SpringBoot.Dto.FileStatistics;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ahmadibrahim.Cloud_Storage_SpringBoot.Dto.FileResponse;
+import com.ahmadibrahim.Cloud_Storage_SpringBoot.Dto.FileStatistics;
 import com.ahmadibrahim.Cloud_Storage_SpringBoot.Model.FileMetadata;
 import com.ahmadibrahim.Cloud_Storage_SpringBoot.Model.User;
 import com.ahmadibrahim.Cloud_Storage_SpringBoot.Repository.FileMetadataRepository;
@@ -45,8 +49,8 @@ public class FileStorageService {
                         file.getId(),
                         file.getName(),
                         file.getMimeType(),
-                        file.getSize()
-                )).collect(Collectors.toList());
+                        file.getSize()))
+                .collect(Collectors.toList());
     }
 
     public FileResponse getFileById(Long id, String username) {
@@ -55,8 +59,8 @@ public class FileStorageService {
                         file.getId(),
                         file.getName(),
                         file.getMimeType(),
-                        file.getSize()
-                )).orElse(null);
+                        file.getSize()))
+                .orElse(null);
     }
 
     public FileMetadata getFileMetadataById(Long id, String username) {
@@ -98,8 +102,7 @@ public class FileStorageService {
                     fileMetadata.getId(),
                     fileMetadata.getName(),
                     fileMetadata.getMimeType(),
-                    fileMetadata.getSize()
-            );
+                    fileMetadata.getSize());
         } catch (Exception e) {
             throw new RuntimeException("Failed to upload file to minio " + e.getMessage(), e);
         }
@@ -109,7 +112,6 @@ public class FileStorageService {
         try {
             FileMetadata fileMetadata = fileMetadataRepository.findByIdAndUsersUsername(fileId, username)
                     .orElseThrow(() -> new RuntimeException("File Not Found Or Access Denied"));
-
 
             InputStream stream = minioClient.getObject(
                     GetObjectArgs.builder()
@@ -134,8 +136,7 @@ public class FileStorageService {
                             .builder()
                             .bucket(bucketName)
                             .object(fileMetadata.getPath())
-                            .build()
-            );
+                            .build());
 
             fileMetadataRepository.deleteById(fileId);
             return true;
@@ -168,8 +169,7 @@ public class FileStorageService {
                 totalSize,
                 imageCount,
                 videoCount,
-                documentCount
-        );
+                documentCount);
     }
 
     /*
@@ -185,5 +185,60 @@ public class FileStorageService {
     public FileMetadata getMetadata(Long fileId) {
         return fileMetadataRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File dengan ID " + fileId + "tidak ditemukan"));
+    }
+
+    public List<FileResponse> searchByFileName(String keyword, String username) {
+        try {
+            Pageable limit = PageRequest.of(0, 10);
+            return fileMetadataRepository.searchByNameAndUsername(username, keyword, limit)
+                    .stream()
+                    .map(file -> new FileResponse(
+                            file.getId(),
+                            file.getName(),
+                            file.getMimeType(),
+                            file.getSize()))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Faied to search file " + e.getMessage());
+        }
+    }
+
+    public List<FileResponse> searchByType(String type, String username) {
+       try {
+           String mimePrefix = switch (type) {
+               case "image" -> "image/";
+               case "video" -> "video/";
+               case "audio" -> "audio/";
+               case "document" -> "application/"; // Seringkali dokumen dimulai dengan application/pdf, ms-word, dll
+               default -> "";
+           };
+
+           return fileMetadataRepository.findByUsersUsernameAndMimeTypeStartingWith(username, mimePrefix)
+                   .stream()
+                   .map(file -> new FileResponse(file.getId(), file.getName(), file.getMimeType(), file.getSize()))
+                   .collect(Collectors.toList());
+       }catch (Exception e){
+           throw new RuntimeException("Failed while filtering data" + e.getMessage());
+       }
+    }
+
+    public List<FileResponse>getAllFilesSorted(String username, String sortBy){
+        Sort sort;
+        switch (sortBy){
+            case "name-desc" -> sort = Sort.by("name").descending();
+            case "size"      -> sort = Sort.by("size").ascending();
+            case "size-desc" -> sort = Sort.by("size").descending();
+            case "name"      -> sort = Sort.by("name").ascending();
+            default          -> sort = Sort.by("name").ascending();
+        }
+
+        return fileMetadataRepository.findByUsersUsername(username, sort)
+                .stream()
+                .map(file -> new FileResponse(
+                        file.getId(),
+                        file.getName(),
+                        file.getMimeType(),
+                        file.getSize()
+                )).collect(Collectors.toList());
     }
 }
